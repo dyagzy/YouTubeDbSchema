@@ -1,0 +1,105 @@
+
+CREATE DATABASE YouTubeDb;
+
+CREATE SCHEMA contents_Owner;
+
+CREATE SCHEMA customers_Users;
+CREATE SCHEMA youTube_contents_Owner;
+
+GO;
+
+--Set up Video table and Relationships
+
+CREATE TABLE contents_Owner.videos  
+	videoId INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	video_Description NVARCHAR(250),
+	duration DEC (5,2) NOT NULL,
+	datePosted date,
+	numberOfViews INT ,
+	is_liked BIT NOT NULL, 
+	comments CHAR(50) NULL,
+	playListId INT  NOT NULL,
+	channel_Id INT  NOT NULL
+	viewId INT  NOT NULL,
+
+
+)
+
+----Set up Channel table and Relationships
+
+CREATE TABLE contents_Owner.channel (
+	channel_Id int NOT NULL PRIMARY KEY,
+	viewId INT NOT NULL,
+	playListId INT  NOT NULL,
+	subscriberId INT  NOT NULL
+
+)
+
+--Set up PlayList table and Relationships
+
+CREATE TABLE contents_Owner.playList (
+	playListId INT  PRIMARY KEY NOT NULL IDENTITY (1,1),
+	channel_Id INT  NOT NULL
+
+
+)
+
+--Set up Subscriber table and Relationships
+
+CREATE TABLE  customers_Users.subscriber (
+
+	subscriberId INT PRIMARY KEY NOT NULL IDENTITY (1,1),
+	first_name VARCHAR (50) NOT NULL,
+    last_name VARCHAR (50) NOT NULL,
+    dateJoined DATETIME,
+    phone VARCHAR(20),
+	channel_Id INT  NOT NULL,
+	viewId INT  
+	
+
+
+)
+
+--Set up many-to-many  table for subscriber playlist 
+
+CREATE TABLE customers_Users.subscriberPlayList (
+
+	subscriberId INT ,
+	playListId INT 
+)
+
+--Set up Viewers table and Relationships
+
+CREATE TABLE customers_Users.viewers (
+	viewerId INT  NOT NULL PRIMARY KEY Identity(1,1),
+	subscriberId INT  NOT NULL,
+	FOREIGN KEY (subscriberId) REFERENCES customers_Users.subscriber (subscriberId),
+	channel_Id INT  NOT NULL
+
+
+)
+
+--Set up many-to-many  table for viewer - playlist 
+
+
+ CREATE TABLE customers_Users.viewerPlayList (
+	
+	viewerId INT  NOT NULL,
+	FOREIGN KEY (viewerId) REFERENCES  customers_Users.viewers (viewerId),
+	playListId INT NOT NULL,
+	FOREIGN KEY (playListId) REFERENCES contents_Owner.playList (playListId)
+
+	
+ );
+
+ --Set up Revenue table and Relationships
+ --Assumptions***
+ ---Revenue is 250 USD per thousand subscriber
+
+ CREATE TABLE youTube_contents_Owner.Revenue (
+	 revenueId INT  NOT NULL PRIMARY KEY,
+	 subscriber_Range INT NOT NULL,
+	 country NVARCHAR(100),
+	 exchangeRate DEC(5,2),
+
+ )
